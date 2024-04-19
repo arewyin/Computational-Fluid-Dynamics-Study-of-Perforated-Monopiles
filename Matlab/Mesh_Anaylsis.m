@@ -1,0 +1,195 @@
+%% Mesh_Analysis
+% For the importation and analysis of data of scaled global mesh sensitivity
+% testing for scaled  CFD simulations. All test were run with wave state
+% #13 with a wave height of 4.25 cm, water depth of 43.75 cm and a period of
+% 2.28 s.
+
+clc
+clear
+close all
+
+%% Variable initialization1
+Period = 2.28;
+Char_L = 0.125;
+
+
+%% Data Import
+Reference_13_08 = import08('F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_08.txt', 9, 1011);
+Reference_13_04 = import04('F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_04.txt', 9, 1011);
+Reference_13_02 = import02('F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_02.txt', 9, 1011);
+Reference_13_01 = import01('F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_01.txt', 9, 1010);
+Reference_13_005 = import005('F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_005.txt', 9, 1011);
+
+Reference_13_08_Press = table2array(importpress("F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_08-Pressure.txt", [10, Inf]));
+Reference_13_04_Press = table2array(importpress("F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_04-Pressure.txt", [10, Inf]));
+Reference_13_02_Press = table2array(importpress("F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_02-Pressure.txt", [10, Inf]));
+Reference_13_01_Press = table2array(importpress("F:\Thesis\Scaled Simulations\Mesh Sensitivity\Reference_13_01-Pressure.txt", [10, Inf]));
+Reference_13_005_Press = table2array(Reference_13_005(:,1:2));
+
+%% Data seperation 
+PressForce_08 = table2array(Reference_13_08(:,2:5));
+PressForce_04 = table2array(Reference_13_04(:,2:5));
+PressForce_02 = table2array(Reference_13_02(:,2:5));
+PressForce_01 = table2array(Reference_13_01(:,2:5));
+PressForce_005 = table2array(Reference_13_005(:,3:6));
+
+Time_08 = table2array(Reference_13_08(:,1));
+Time_04 = table2array(Reference_13_04(:,1));
+Time_02 = table2array(Reference_13_02(:,1));
+Time_01 = table2array(Reference_13_01(:,1));
+Time_005 = table2array(Reference_13_005(:,1));
+
+[~,~,~,~,umax] = WaveSolver(Period,0.4375,0.0425);
+
+
+%% KC Number Calc
+KC = abs(umax)*Period/Char_L;
+
+
+
+%% Comparison of Total Pressure Force on Component 1
+% Seperation of Total Force from Array
+A = PressForce_08(3:end,4);
+B = PressForce_04(3:end,4);
+C = PressForce_02(3:end,4);
+D = PressForce_01(3:end,4);
+E = PressForce_005(3:end,4);
+
+% Plotting
+figure(1)
+plot(Time_08(3:end), A);
+hold on 
+plot(Time_04(3:end), B);
+plot(Time_02(3:end), C);
+plot(Time_01(3:end), D);
+plot(Time_005(3:end), E);
+xlim([7.8 13.2])
+ylim([0 7])
+
+% Adding Labels to Plot
+title('Total Pressure Force on Monopile for Varying Global Mesh Sizes')
+xlabel('Time(s)')
+ylabel('Force(N)')
+legend('0.08' , '0.04' , '0.02' , '0.01' , '0.005') 
+
+% Calculation of Correlation Coefficients
+ab = corrcoef(A,B);
+bc = corrcoef(B,C);
+cd = corrcoef(C,D);
+de = corrcoef(D,E);
+
+%% Comparison of X Pressure Force on Component 1
+A = PressForce_08(3:end,1);
+B = PressForce_04(3:end,1);
+C = PressForce_02(3:end,1);
+D = PressForce_01(3:end,1);
+E = PressForce_005(3:end,1);
+
+figure(2)
+plot(Time_08(3:end), A);
+hold on 
+plot(Time_04(3:end), B);
+plot(Time_02(3:end), C);
+plot(Time_01(3:end), D);
+plot(Time_005(3:end), E);
+xlim([7.8 13.2])
+ylim([-0.4 0.6])
+
+% Adding Labels to Plot
+title('X Pressure Force on Monopile for Varying Global Mesh Sizes')
+xlabel('Time(s)')
+ylabel('Force(N)')
+legend('0.08' , '0.04' , '0.02' , '0.01' , '0.005') 
+
+abx = corrcoef(A,B);
+bcx = corrcoef(B,C);
+cdx = corrcoef(C,D);
+dex = corrcoef(D,E);
+
+%% Comparison of Y Pressure Force on Component 1
+A = PressForce_08(3:end,2);
+B = PressForce_04(3:end,2);
+C = PressForce_02(3:end,2);
+D = PressForce_01(3:end,2);
+E = PressForce_005(3:end,2);
+
+figure(3)
+plot(Time_08(3:end), A);
+hold on 
+plot(Time_04(3:end), B);
+plot(Time_02(3:end), C);
+plot(Time_01(3:end), D);
+plot(Time_005(3:end), E);
+xlim([7.8 13.2])
+ylim([-5 10])
+
+% Adding Labels to Plot
+title('Y Pressure Force on Monopile for Varying Global Mesh Sizes')
+xlabel('Time(s)')
+ylabel('Force(N)')
+legend('0.08' , '0.04' , '0.02' , '0.01' , '0.005') 
+
+aby = corrcoef(A,B);
+bcy = corrcoef(B,C);
+cdy = corrcoef(C,D);
+dey = corrcoef(D,E);
+
+%% Comparison of Z Pressure Force on Component 1
+A = PressForce_08(:,3);
+B = PressForce_04(:,3);
+C = PressForce_02(:,3);
+D = PressForce_01(:,3);
+E = PressForce_005(:,3);
+
+figure(4)
+plot(Time_08, A);
+hold on 
+plot(Time_04, B);
+plot(Time_02, C);
+plot(Time_01, D);
+plot(Time_005, E);
+xlim([7.8 13.2])
+
+% Adding Labels to Plot
+title('Z Pressure Force on Monopile for Varying Global Mesh Sizes')
+xlabel('Time(s)')
+ylabel('Force(N)')
+legend('0.08' , '0.04' , '0.02' , '0.01' , '0.005') 
+
+abz = corrcoef(A,B);
+bcz = corrcoef(B,C);
+cdz = corrcoef(C,D);
+dez = corrcoef(D,E);
+
+
+
+%% Comparison of Pressure at probe point
+F = Reference_13_08_Press(:,2);
+G = Reference_13_04_Press(:,2);
+H = Reference_13_02_Press(:,2);
+I = Reference_13_01_Press(:,2);
+J = Reference_13_005_Press(:,2);
+
+figure(5)
+plot(Reference_13_08_Press(:,1), Reference_13_08_Press(:,2));
+hold on 
+plot(Reference_13_04_Press(:,1), Reference_13_04_Press(:,2));
+plot(Reference_13_02_Press(:,1), Reference_13_02_Press(:,2));
+plot(Reference_13_01_Press(:,1), Reference_13_01_Press(:,2));
+plot(Reference_13_005_Press(:,1), Reference_13_005_Press(:,2));
+
+% Adding Labels to Plot
+title('Probe Pressure Force for Varying Global Mesh Sizes')
+xlabel('Time(s)')
+ylabel('Pressure(kPa)')
+legend('0.08' , '0.04' , '0.02' , '0.01' , '0.005') 
+
+fg = corrcoef(F,G);
+gh = corrcoef(G,H);
+hi = corrcoef(H,I);
+jk = corrcoef(I,J);
+
+
+
+
+
